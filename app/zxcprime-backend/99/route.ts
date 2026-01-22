@@ -1,4 +1,3 @@
-
 import { encodeBase64Url } from "@/lib/base64";
 import { fetchWithTimeout } from "@/lib/fetch-timeout";
 import { NextRequest, NextResponse } from "next/server";
@@ -52,8 +51,8 @@ export async function GET(req: NextRequest) {
 
     const sourceLink =
       media_type === "tv"
-        ? `https://api.madplay.site/api/rogflix?id=${id}&season=${season}&episode=${episode}&type=series`
-        : `https://api.madplay.site/api/rogflix?id=${id}&type=movie`;
+        ? `https://api.madplay.site/api/movies/holly?id=${id}&season=${season}&episode=${episode}&type=series`
+        : `https://api.madplay.site/api/movies/holly?id=${id}&type=movie`;
 
     // const res = await fetch(sourceLink, {
     //   headers: {
@@ -88,17 +87,18 @@ export async function GET(req: NextRequest) {
         { status: 404 },
       );
     }
-    const firstSource = data.find((f) => f.title === "English").file;
-    if (!sourceLink)
+    const firstSource = data.at(-1).file;
+    const firstSourceType = data.at(-1).type;
+    if (!firstSource)
       return NextResponse.json(
-        { success: false, error: "No English stream found" },
+        { success: false, error: "No stream found" },
         { status: 404 },
       );
 
     return NextResponse.json({
       success: true,
       link: firstSource,
-      type: "hls",
+      type: firstSourceType,
     });
   } catch (error) {
     return NextResponse.json(

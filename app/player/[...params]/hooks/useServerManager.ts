@@ -35,6 +35,7 @@ export function useServerManager({
 }) {
   const [servers, setServers] = useState<ServerTypes[]>([
     { name: "ZXC Server", server: 0, status: "queue", desc: "" },
+    { name: "PRIME Server", server: 99, status: "queue", desc: "" },
     { name: "Main Server", server: 1, status: "queue", desc: "" },
     { name: "Server 2", server: 2, status: "queue", desc: "" },
     { name: "Server 3", server: 3, status: "queue", desc: "" },
@@ -68,14 +69,14 @@ export function useServerManager({
 
   const updateServerStatus = (index: number, status: ServerTypes["status"]) =>
     setServers((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, status } : s))
+      prev.map((s, i) => (i === index ? { ...s, status } : s)),
     );
   useEffect(() => {
     const current = servers[serverIndex];
     if (!current || current.status !== "failed") return;
 
     let nextIndex = servers.findIndex(
-      (s) => s.status === "queue" || s.status === "cancelled"
+      (s) => s.status === "queue" || s.status === "cancelled",
     );
 
     if (nextIndex === -1) {
@@ -144,7 +145,7 @@ export function useServerManager({
           return { ...s, status: "checking" };
         }
         return s;
-      })
+      }),
     );
     setServerIndex(index);
   };

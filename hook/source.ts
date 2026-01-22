@@ -26,7 +26,7 @@ export default function useSource({
     queryKey: ["get-source", id, media_type, season, episode, imdbId, server],
     enabled: !!id && !!imdbId,
     queryFn: async () => {
-      if ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].includes(server)) {
+      if ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 99].includes(server)) {
         const { f_token, f_ts } = generateFrontendToken(String(id));
 
         const tokenRes = await axios.post("/api/token", {
@@ -41,7 +41,7 @@ export default function useSource({
             media_type === "tv" ? `&c=${season}&d=${episode}` : ""
           }${
             imdbId !== null ? `&e=${imdbId}` : ""
-          }&gago=${ts}&putanginamo=${token}&f_token=${f_token}`
+          }&gago=${ts}&putanginamo=${token}&f_token=${f_token}`,
         );
 
         return res.data;

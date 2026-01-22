@@ -1,0 +1,157 @@
+https://cdn.madplay.site/api/hls/unknown/629542/master.m3u8
+https://api.madplay.site/api/rogflix?id=66732&season=1&episode=1&type=seriesimport { encodeBase64Url } from "@/lib/base64";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(req: NextRequest) {
+  try {
+    const id = req.nextUrl.searchParams.get("a");
+    const media_type = req.nextUrl.searchParams.get("b");
+    const season = req.nextUrl.searchParams.get("c");
+    const episode = req.nextUrl.searchParams.get("d");
+    const ts = req.nextUrl.searchParams.get("t");
+
+    // basic validation
+    if (!id || !media_type || !ts) {
+      return NextResponse.json(
+        { success: false, error: "Invalid request" },
+        { status: 400 }
+      );
+    }
+
+    // ⏱ expire after 8 seconds
+    if (Date.now() - Number(ts) > 8000) {
+      return NextResponse.json(
+        { success: false, error: "Invalid token" },
+        { status: 403 }
+      );
+    }
+
+    // block direct /api access
+    const referer = req.headers.get("referer") || "";
+    if (
+      !referer.includes("/api/") &&
+      !referer.includes("localhost") &&
+      !referer.includes("https://www.zxcstream.xyz/")
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Forbidden" },
+        { status: 403 }
+      );
+    }
+
+    const sourceLink =
+      media_type === "tv"
+        ? `https://api.madplay.site/api/rogflix?id=${id}&season=${season}&episode=${episode}&type=series`
+        : `https://cdn.madplay.site/api/hls/unknown/${id}/master.m3u8`;
+
+    if (media_type === "tv") {
+      const res = await fetch(sourceLink, {
+        headers: {
+          "User-Agent": "Mozilla/5.0",
+          Referer: "https://uembed.xyz/",
+        },
+      });
+      if (!res.ok) {
+        return NextResponse.json(
+          { success: false, error: "Upstream request failed" },
+          { status: res.status }
+        );
+      }
+
+      const data = await res.json();
+
+      if (!Array.isArray(data) || data.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "No m3u8 stream found" },
+          { status: 404 }
+        );
+      }
+      const firstSource = data.find((f) => f.title === "English").file;
+      if (!sourceLink)
+        return NextResponse.json(
+          { success: false, error: "No English stream found" },
+          { status: 404 }
+        );
+
+      return NextResponse.json({
+        success: true,
+        link: firstSource,
+        type: "hls",
+      });
+    } else {
+      return NextResponse.json({
+        success: true,
+        link: sourceLink,
+        type: "hls",
+      });
+    }
+
+    // const proxy = "https://damp-bonus-5625.mosangfour.workers.dev/?u=";
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+// src/app/api/hls-proxy/route.ts
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(req: NextRequest) {
+  const urlParam = new URL(req.url).searchParams.get("url");
+  if (!urlParam) return new NextResponse("Missing ?url=", { status: 400 });
+
+  const targetUrl = decodeURIComponent(urlParam);
+  if (!targetUrl.startsWith("http") || !targetUrl.endsWith(".m3u8")) {
+    return new NextResponse("Invalid URL", { status: 400 });
+  }
+
+  try {
+    const res = await fetch(targetUrl, {
+      headers: {
+        Referer: "https://madplay.site/",
+        Origin: "https://madplay.site/",
+        "User-Agent": "Mozilla/5.0",
+      },
+    });
+
+    if (!res.ok)
+      return new NextResponse("Failed to fetch playlist", {
+        status: res.status,
+      });
+
+    const text = await res.text();
+
+    const rewritten = text
+      .replace(/^((?!#).*)$/gm, (line) => {
+        line = line.trim();
+        if (!line) return line;
+        const full = new URL(line, targetUrl).toString();
+        return full.endsWith(".m3u8")
+          ? `/api/hls-proxy?url=${encodeURIComponent(full)}`
+          : full;
+      })
+      .replace(/URI="([^"]+)"/g, (_, uri) => {
+        const full = new URL(uri, targetUrl).toString();
+        return full.endsWith(".m3u8")
+          ? `URI="/api/hls-proxy?url=${encodeURIComponent(full)}"`
+          : `URI="${full}"`;
+      });
+
+    return new NextResponse(rewritten, {
+      headers: {
+        "Content-Type": "application/vnd.apple.mpegurl",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "public, max-age=3600", // cache for 1 hour
+      },
+    });
+  } catch {
+    return new NextResponse("Proxy failed", { status: 502 });
+  }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    headers: { "Access-Control-Allow-Origin": "*" },
+  });
+}

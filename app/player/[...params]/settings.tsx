@@ -87,7 +87,7 @@ export default function PlayerSettings({
       lockTimer();
     }
   };
-  console.log(":", data_sub);
+
   return (
     <div
       className="relative"

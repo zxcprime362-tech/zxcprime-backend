@@ -71,59 +71,30 @@ export function useVideoSource({
           }
         });
         hls.on(Hls.Events.ERROR, (_, data) => {
-          console.groupCollapsed(
-            "%c[HLS ERROR EVENT]",
-            "color: orange; font-weight: bold;",
-          );
-          console.log("fatal:", data.fatal);
-          console.log("type:", data.type);
-          console.log("details:", data.details);
-          console.log("reason:", data.reason);
-          console.log("serverIndex:", serverIndex);
-          console.log("failedRef.current (before):", failedRef.current);
-          console.groupEnd();
-
-          // Ignore non-fatal errors
-          if (!data.fatal) {
-            console.log("[HLS] Non-fatal error ignored");
-            return;
-          }
-
-          // Prevent double-fail
-          if (failedRef.current) {
-            console.warn("[HLS] Server already marked as failed — skipping");
-            return;
-          }
-
-          // Always try to recover media errors
-          if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-            console.warn("[HLS] MEDIA_ERROR → attempting recoverMediaError()");
-            hls.recoverMediaError();
-            return;
-          }
-
-          // Only fail server on unrecoverable network errors
-          if (
-            data.type === Hls.ErrorTypes.NETWORK_ERROR &&
-            (data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR ||
-              data.details === Hls.ErrorDetails.KEY_LOAD_ERROR)
-          ) {
-            console.error("[HLS] UNRECOVERABLE NETWORK ERROR → failing server");
-            console.log("Marking server as failed:", serverIndex);
-
-            failedRef.current = true;
+          if (data.fatal) {
+            // Mark server failed only on fatal errors
             updateServerStatus(serverIndex, "failed");
 
-            console.log(
-              "[HLS] Removing ERROR listener and destroying instance",
-            );
-            hls.off(Hls.Events.ERROR);
-            hls.destroy();
-            return;
+            // Use Hls.ErrorTypes constants
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                // Try to recover network
+                hls.startLoad();
+                break;
+
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                // Try to recover media
+                hls.recoverMediaError();
+                break;
+
+              default:
+                // Unrecoverable, destroy instance
+                hls.destroy();
+                break;
+            }
           }
 
-          // Catch-all for fatal but unhandled cases
-          console.warn("[HLS] Fatal error but no fail condition matched");
+          // If not fatal, HLS.js will handle retries automatically
         });
 
         return () => {

@@ -739,12 +739,14 @@ export default function Player() {
                     e.stopPropagation();
                   }}
                 >
-                  <div className="absolute inset-0 rounded ">
-                    <div
-                      className="h-full bg-muted-foreground/50 rounded"
-                      style={{ width: `${buffered * 100}%` }}
-                    />
-                  </div>
+                  {source?.type === "hls" && (
+                    <div className="absolute inset-0 rounded ">
+                      <div
+                        className="h-full bg-muted-foreground/50 rounded"
+                        style={{ width: `${buffered * 100}%` }}
+                      />
+                    </div>
+                  )}
                   {/* Tooltip */}
                   {hoverTime !== null && (
                     <div

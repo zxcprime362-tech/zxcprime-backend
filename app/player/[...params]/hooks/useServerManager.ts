@@ -40,15 +40,15 @@ export function useServerManager({
   const [servers, setServers] = useState<ServerTypes[]>([
     {
       name: "Primary Server",
-      server: 0,
-      status: "queue",
-      desc: "Main streaming server",
-    },
-    {
-      name: "Secondary Server",
       server: 2,
       status: "queue",
       desc: "Fallback streaming server",
+    },
+    {
+      name: "Secondary Server",
+      server: 0,
+      status: "queue",
+      desc: "Main streaming server",
     },
     {
       name: "Primary Backup Server",

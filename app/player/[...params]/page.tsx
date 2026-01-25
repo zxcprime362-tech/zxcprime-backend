@@ -306,7 +306,7 @@ export default function Player() {
       <video muted={autoPlay} className="h-full w-full" ref={videoRef}>
         {vttUrl && !isInitializing && toggleSub && (
           <track
-            key={`${vttUrl}-${server}`}
+            key={`${vttUrl}-${serverIndex}-${source?.type}`}
             kind="subtitles"
             src={vttUrl}
             default

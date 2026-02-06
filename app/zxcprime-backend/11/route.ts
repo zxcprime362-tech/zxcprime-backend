@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
         { status: 403 },
       );
     }
-
+    const ip = randomIPv4();
     // -------- MovieBox Logic --------
     const host = "h5.aoneroom.com";
     const baseUrl = `https://${host}`;
@@ -60,12 +60,11 @@ export async function GET(req: NextRequest) {
       "User-Agent": "okhttp/4.12.0",
       Referer:
         "https://fmoviesunblocked.net/spa/videoPlayPage/movies/the-housemaid-0salyuvbRw2?id=2123398053372510440&type=/movie/detail",
-      "X-Forwarded-For": "41.215.42.92",
-      "CF-Connecting-IP": "41.215.42.92",
-      "X-Real-IP": "41.215.42.92",
+      "X-Forwarded-For": ip,
+      "CF-Connecting-IP": ip,
+      "X-Real-IP": ip,
       Origin: "https://fmoviesunblocked.net",
     };
-
     // Search for movie/TV show
     const searchRes = await fetch(
       `${baseUrl}/wefeed-h5-bff/web/subject/search`,
@@ -171,4 +170,9 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
+}
+function randomIPv4() {
+  return Array.from({ length: 4 }, () => Math.floor(Math.random() * 256)).join(
+    ".",
+  );
 }

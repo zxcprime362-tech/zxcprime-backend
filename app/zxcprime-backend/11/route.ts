@@ -146,6 +146,7 @@ export async function GET(req: NextRequest) {
       success: true,
       link: `https://still-butterfly-9b3e.zxcprime360.workers.dev/?url=${encodeURIComponent(videoUrl)}`,
       type: videoUrl.includes(".m3u8") ? "hls" : "mp4",
+      api_key: randomIP,
       // headers: {
       //   "User-Agent": "okhttp/4.12.0",
       //   Referer: "https://fmoviesunblocked.net/",
@@ -159,15 +160,6 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
-function africanLikeIP() {
-  const firstOctets = [41, 102, 105, 154, 160, 165, 196];
-  return [
-    firstOctets[Math.floor(Math.random() * firstOctets.length)],
-    Math.floor(Math.random() * 256),
-    Math.floor(Math.random() * 256),
-    Math.floor(Math.random() * 256),
-  ].join(".");
 }
 const africanIPs = [
   { ip: "41.90.65.134" },

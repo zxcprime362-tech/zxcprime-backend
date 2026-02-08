@@ -36,14 +36,13 @@ import { useFullscreen } from "@/lib/player-fullscreen";
 import { Button } from "@/components/ui/button";
 import { useVideoAudio } from "./hooks/useVideoAudio";
 import PlayerSettings from "./settings";
-import { useLibreSubsTV } from "@/hook/subtitle-hooks";
+import {  useSubtitles } from "@/hook/subtitle-hooks";
 import { useSubtitleUrl } from "@/hook/subtitle";
 import Link from "next/link";
 import Episodes from "./episodes";
 import Failed from "./failed";
 import useIntro from "@/hook/intro";
 import PlayerServer from "./servers";
-import { useVdrkSubtitle } from "@/hook/subtitle-2";
 import DynamicTip from "./dynamic-tip";
 /* ================= TYPES ================= */
 
@@ -179,8 +178,8 @@ export default function Player() {
   //   season: media_type === "tv" ? season : undefined,
   //   episode: media_type === "tv" ? episode : undefined,
   // });
-  const { data: vdrk_sub } = useVdrkSubtitle({
-    tmdbId: metadata?.id ?? null,
+  const { data: vdrk_sub } = useSubtitles({
+    tmdbId: metadata?.id,
     media_type: media_type,
     season: media_type === "tv" ? season : undefined,
     episode: media_type === "tv" ? episode : undefined,
@@ -188,8 +187,8 @@ export default function Player() {
 
   const vttUrl = useSubtitleUrl(selectedSub);
   const englishDefault = (vdrk_sub ?? []).find((s) =>
-    s.label.startsWith("English"),
-  )?.file;
+    s.display.startsWith("English"),
+  )?.url;
   useEffect(() => {
     if (englishDefault) {
       setSelectedSub(englishDefault);

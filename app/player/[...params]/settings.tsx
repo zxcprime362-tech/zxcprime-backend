@@ -257,11 +257,10 @@ export default function PlayerSettings({
                 {data_sub.map((s, idx) => (
                   <SubtitleButton
                     key={idx}
-                    active={s.file === selectedSub}
-                    label={s.label}
-                    // flag={s.flagUrl}
+                    active={s.url === selectedSub}
+                    label={s.display}
                     onClick={() => {
-                      setSelectedSub(s.file);
+                      setSelectedSub(s.url);
                       setOpenSub(false);
                     }}
                   />
@@ -394,7 +393,7 @@ export default function PlayerSettings({
                   <MenuButton
                     label={`Timing ${
                       selectedSub &&
-                      `(${data_sub.find((s) => s.file === selectedSub)?.label})`
+                      `(${data_sub.find((s) => s.url === selectedSub)?.display})`
                     }`}
                     onClick={() => setOpenTiming(true)}
                   />

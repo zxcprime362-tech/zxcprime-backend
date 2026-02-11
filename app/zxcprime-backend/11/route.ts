@@ -156,7 +156,9 @@ export async function GET(req: NextRequest) {
       "https://still-butterfly-9b3e.zxcprime360.workers.dev/",
     ];
     const workingProxy = await getWorkingProxy(videoUrl, proxies);
+
     if (!workingProxy) {
+      console.log("No working proxy");
       return NextResponse.json(
         { success: false, error: "No working proxy available" },
         { status: 502 },

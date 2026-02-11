@@ -44,7 +44,7 @@ export default function useSource({
         const { f_token, f_ts } = generateFrontendToken(String(id));
 
         const tokenRes = await axios.post("/api/token", {
-          id,
+          idd: id,
           f_token,
           ts: f_ts,
         });

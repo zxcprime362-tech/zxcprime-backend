@@ -57,7 +57,7 @@ function generateBackendToken(f_token: string, id: string) {
 const blockedIPs = ["45.86.86.43"];
 
 export async function POST(req: NextRequest) {
-  const { id, f_token, ts } = await req.json();
+  const { idd, f_token, ts } = await req.json();
   const forwardedFor = req.headers.get("x-forwarded-for");
   const ip = forwardedFor?.split(",")[0] || "Unknown";
   const ua = req.headers.get("user-agent") || "unknown";
@@ -82,13 +82,13 @@ export async function POST(req: NextRequest) {
     return new Response(null, { status: 403 });
   }
 
-  if (!validateFrontendToken(f_token, id, ts)) {
+  if (!validateFrontendToken(f_token, idd, ts)) {
     return NextResponse.json(
       { error: "Invalid frontend token" },
       { status: 403 },
     );
   }
 
-  const b_token = generateBackendToken(f_token, id);
+  const b_token = generateBackendToken(f_token, idd);
   return NextResponse.json(b_token);
 }

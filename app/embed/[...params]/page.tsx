@@ -4,6 +4,7 @@ import { useState } from "react";
 import "ldrs/react/Ring.css";
 import { Tailspin } from "ldrs/react";
 import "ldrs/react/Tailspin.css";
+import { useAdStore } from "@/store/ad-store";
 export default function ZXCPlayer() {
   const { params } = useParams() as { params?: string[] };
   const [isLoading, setIsLoading] = useState(true);
@@ -21,8 +22,12 @@ export default function ZXCPlayer() {
 
   const path = `/api/backup?${query}`;
   console.log(path);
+  const triggerAd = useAdStore((state) => state.triggerAd);
   return (
-    <div className="relative w-full h-dvh bg-black overflow-hidden">
+    <div
+      className="relative w-full h-dvh bg-black overflow-hidden"
+      onClick={triggerAd}
+    >
       {/* Loading Screen */}
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">

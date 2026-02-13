@@ -81,7 +81,7 @@ export function useServerManager({
       name: "Morpheus VIII",
       server: 7,
       status: "queue",
-      desc: "",
+      desc: "Spanish Audio",
     },
     {
       name: "Talos IX",

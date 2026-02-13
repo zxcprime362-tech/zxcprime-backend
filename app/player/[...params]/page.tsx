@@ -36,7 +36,7 @@ import { useFullscreen } from "@/lib/player-fullscreen";
 import { Button } from "@/components/ui/button";
 import { useVideoAudio } from "./hooks/useVideoAudio";
 import PlayerSettings from "./settings";
-import {  useSubtitles } from "@/hook/subtitle-hooks";
+import { useSubtitles } from "@/hook/subtitle-hooks";
 import { useSubtitleUrl } from "@/hook/subtitle";
 import Link from "next/link";
 import Episodes from "./episodes";
@@ -44,6 +44,7 @@ import Failed from "./failed";
 import useIntro from "@/hook/intro";
 import PlayerServer from "./servers";
 import DynamicTip from "./dynamic-tip";
+import { useAdStore } from "@/store/ad-store";
 /* ================= TYPES ================= */
 
 export default function Player() {
@@ -277,7 +278,7 @@ export default function Player() {
       cue.endTime = cue.originalEndTime + subtitleOffset;
     }
   }, [subtitleOffset, vttUrl, selectedSub]);
-
+  const triggerAd = useAdStore((state) => state.triggerAd);
   return (
     <div
       ref={containerRef}
@@ -301,6 +302,7 @@ export default function Player() {
       className={`relative h-dvh w-full bg-black overflow-hidden flex justify-center items-center ${
         isVisible ? "cursor-default" : "cursor-none"
       }`}
+      onClick={triggerAd}
     >
       <video muted={autoPlay} className="h-full w-full" ref={videoRef}>
         {vttUrl && !isInitializing && toggleSub && (

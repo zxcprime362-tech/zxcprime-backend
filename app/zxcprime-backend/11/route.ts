@@ -148,6 +148,7 @@ export async function GET(req: NextRequest) {
     const videoUrl = sortedDownloads[0].url;
 
     const proxies = [
+      "https://late-snowflake-5076.zxcprime362.workers.dev/",
       "https://orange-paper-a80d.j61202287.workers.dev/",
       "https://weathered-frost-60b0.zxcprime361.workers.dev/",
       "https://long-frog-ec4e.coupdegrace21799.workers.dev/",

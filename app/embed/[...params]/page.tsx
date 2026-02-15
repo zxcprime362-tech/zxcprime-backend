@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "ldrs/react/Ring.css";
 import { Tailspin } from "ldrs/react";
 import "ldrs/react/Tailspin.css";
@@ -8,7 +8,7 @@ import { useAdStore } from "@/store/ad-store";
 export default function ZXCPlayer() {
   const { params } = useParams() as { params?: string[] };
   const [isLoading, setIsLoading] = useState(true);
-
+  const [showAd, setShowAd] = useState(true);
   const media_type = params?.[0];
   const id = params?.[1];
   const season = params?.[2];
@@ -19,16 +19,29 @@ export default function ZXCPlayer() {
     id: id || "",
     ...(media_type === "tv" && season && episode ? { season, episode } : {}),
   }).toString();
-
   const path = `/api/backup?${query}`;
   console.log(path);
-  const triggerAd = useAdStore((state) => state.triggerAd);
+
+  useEffect(() => {
+    if (!showAd) {
+      const timer = setTimeout(() => {
+        setShowAd(true);
+      }, 300000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showAd]);
   return (
-    <div
-      className="relative w-full h-dvh bg-black overflow-hidden"
-      onClick={triggerAd}
-    >
-      {/* Loading Screen */}
+    <div className="relative w-full h-dvh bg-black overflow-hidden">
+      {showAd && (
+        <a
+          href="https://robotbagpipe.com/m1n8h68e?key=a640607f30762b7dd7189c135c77afcd"
+          target="_blank"
+          className="fixed inset-0 z-50"
+          onClick={() => setShowAd(false)}
+        ></a>
+      )}
+
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
           <Tailspin size="80" stroke="7" speed="0.9" color="white" />
